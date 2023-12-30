@@ -1,7 +1,10 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/watcherwhale/ords/internal/config"
 	"oras.land/oras-go/v2/registry/remote/auth"
 	"oras.land/oras-go/v2/registry/remote/retry"
 )
@@ -21,7 +24,20 @@ func ConfigureRouter(r *gin.Engine) {
 }
 
 func getRegistry(ctx *gin.Context) {
-    ctx.Set("registry", "index.docker.io")
+	registryParam := ctx.Param("registry")
+	registry, ok := config.Config.Registries[registryParam]
+
+	if !ok {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code": http.StatusBadRequest,
+			"message": "Registry does not exist",
+		})
+
+		return
+	}
+
+    ctx.Set("registry", registry)
+	ctx.Next()
 }
 
 func attachOCIAuth(ctx *gin.Context) {
@@ -42,5 +58,5 @@ func attachOCIAuth(ctx *gin.Context) {
         ctx.Set("ociauth", client)
     }
 
-    ctx.Next()
+	ctx.Next()
 }
