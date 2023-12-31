@@ -1,0 +1,7 @@
+apiVersion: v2
+name: ords
+description: Download your OCI stored files from an URl instead of a CLI.
+type: application
+
+version: 0.0.0
+appVersion: "0.0.0"
